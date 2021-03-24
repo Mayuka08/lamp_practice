@@ -20,7 +20,7 @@ if(is_admin($user) === false){
 
 $item_id = get_post('item_id');
 $stock = get_post('stock');
-$token =get_csrf_token();
+
 
 if(is_valid_csrf_token($token)) {
   if(update_item_stock($db, $item_id, $stock)){
