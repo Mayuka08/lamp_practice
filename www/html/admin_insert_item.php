@@ -17,7 +17,7 @@ $user = get_login_user($db);
 if(is_admin($user) === false){
   redirect_to(LOGIN_URL);
 }
-
+$token = get_post('token');
 $name = get_post('name');
 $price = get_post('price');
 $status = get_post('status');
@@ -25,10 +25,14 @@ $stock = get_post('stock');
 
 $image = get_file('image');
 
-if(regist_item($db, $name, $price, $stock, $status, $image)){
-  set_message('商品を登録しました。');
-}else {
-  set_error('商品の登録に失敗しました。');
+if(is_valid_csrf_token($token)) {
+  if(regist_item($db, $name, $price, $stock, $status, $image)){
+    set_message('商品を登録しました。');
+  }else {
+    set_error('商品の登録に失敗しました。');
+  }
+}else{
+  set_error('不正な操作が行われました。');
 }
 
 
