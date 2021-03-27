@@ -76,6 +76,53 @@ function insert_cart($db, $user_id, $item_id, $amount = 1){
   return execute_query($db, $sql,[$item_id,$user_id,$amount]);
 }
 
+function purchasetable_transaction($dbh,$sql,$order_id,$user_id,$quantity,$item_id,$amount,$purchase_praice){
+  try{
+    $dbh->beginTransaction();
+    insert_history($db,$sql,$order_id,$user_id,$quantity);
+    $stmt->execute();
+
+    $order_id = $dbh->lastInsertId();
+    foreach($carts as $cart) {
+      insert_details($item_id,$amount,$purchase_praice);
+    }
+    $stmt->execute();
+    $dbh -> commit();
+  }catch(PDOException $e) {
+      $dbh->rollback();
+      throw $e;
+  }
+  return true;
+}
+
+function insert_history($db, $sql,$order_id,$user_id,$quantity){
+    $sql = "
+      INSERT INTO
+        purchase_history(
+          order_id,
+          user_id,
+          order_datetime,
+          quantity
+        )
+      VALUES(?,?,now(),?)
+    ";
+    return execute_query($db, $sql,[$order_id,$user_id,$quantity]);
+}
+
+function insert_details($order_id,$item_id,$amount,$purchase_praice){
+  $sql = "
+    INSERT INTO
+      purchase_details(
+        order_id,
+        item_id,
+        amount,
+        purchase_praice
+      )
+    VALUES(?,?,?,?)
+  ";
+  return execute_query($db, $sql,[$order_id,$item_id,$amount,$purchase_praice]);
+}
+
 function update_cart_amount($db, $cart_id, $amount){
   $sql = "
     UPDATE
@@ -114,7 +161,7 @@ function purchase_carts($db, $carts){
       set_error($cart['name'] . 'の購入に失敗しました。');
     }
   }
-  
+  purchasetable_transaction($dbh,$sql,$order_id,$user_id,$quantity,$item_id,$amount,$purchase_praice);
   delete_user_carts($db, $carts[0]['user_id']);
 }
 
