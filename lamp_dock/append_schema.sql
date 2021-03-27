@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- ホスト: mysql
--- 生成日時: 2021 年 3 月 25 日 17:42
+-- 生成日時: 2021 年 3 月 27 日 04:04
 -- サーバのバージョン： 5.7.33
 -- PHP のバージョン: 7.4.15
 
@@ -55,7 +55,7 @@ CREATE TABLE `purchase_history` (
 -- テーブルのインデックス `purchase_details`
 --
 ALTER TABLE `purchase_details`
-  ADD PRIMARY KEY (`item_id`);
+  ADD PRIMARY KEY (`order_id`,`item_id`) USING BTREE;
 
 --
 -- テーブルのインデックス `purchase_history`
@@ -66,12 +66,6 @@ ALTER TABLE `purchase_history`
 --
 -- ダンプしたテーブルの AUTO_INCREMENT
 --
-
---
--- テーブルの AUTO_INCREMENT `purchase_details`
---
-ALTER TABLE `purchase_details`
-  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- テーブルの AUTO_INCREMENT `purchase_history`
