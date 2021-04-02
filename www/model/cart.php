@@ -75,28 +75,27 @@ function insert_cart($db, $user_id, $item_id, $amount = 1){
 
   return execute_query($db, $sql,[$item_id,$user_id,$amount]);
 }
-
-function purchasetable_check($dbh,$carts){
-  if(insert_history($db,$user_id,$quantity) === false){
-    set_error('エラーが発生しました再度お試しください');
-    return false;
+// $quantity　コントローラーで呼び出す
+function sum_purchase($carts,$purchase_price){
+  $quantity = 0;
+  foreach($carts as $cart){
+    $quantity += $purchase_price * $cart['amount'];
   }
+  return $quantity;
 }
 
-function insert_history($db,$user_id,$quantity){
+function insert_history($db,$user_id){
     $sql = "
       INSERT INTO
         purchase_history(
           user_id,
           order_datetime,
-          quantity
         )
       VALUES(?,now(),?)
     ";
-    return execute_query($db,$sql,[$user_id,$quantity]);
+    return execute_query($db,$sql,[$user_id]);
 }
-
-function insert_details($order_id,$item_id,$amount,$purchase_price){
+function insert_details($db,$order_id,$item_id,$amount,$purchase_price){
   $sql = "
     INSERT INTO
       purchase_details(
@@ -131,40 +130,40 @@ function delete_cart($db, $cart_id){
       cart_id = ?
     LIMIT 1
   ";
-
   return execute_query($db, $sql,[$cart_id]);
 }
-
+//購入後カートの中身削除、在庫変動、履歴＆明細にデータいれる
 function purchase_carts($db, $carts){
   if(validate_cart_purchase($carts) === false){
     return false;
   }
-  try {
-    $dbh->beginTransaction();
+  $dbh->beginTransaction();
+  insert_history($db,$carts[0]['user_id']);
+  $oder_id = $dbh->lastInsertId();
 
-    foreach($carts as $cart){
-      if(update_item_stock(
-          $db, 
-          $cart['item_id'], 
-          $cart['stock'] - $cart['amount']
-        ) === false){
-        set_error($cart['name'] . 'の購入に失敗しました。');
-      }
-      if(insert_details(
-          $cart['order_id'],
-          $cart['item_id'],
-          $cart['amount'],
-          $cart['purchase_price']) === false) {
-            return false;
-          }
+  foreach($carts as $cart){
+    if(update_item_stock(
+        $db, 
+        $cart['item_id'], 
+        $cart['stock'] - $cart['amount']
+      ) === false){
+      set_error($cart['name'] . 'の購入に失敗しました。');
     }
-    $oder_id = $dbh->lastInsertId();
-    insert_history($db,$user_id,$quantity);
-    purchasetable_check($db,$carts);
-    delete_user_carts($db, $carts[0]['user_id']);
-  }catch{
-    $dbh->rollback();
+    if(insert_details(
+        $oder_id,
+        $cart['item_id'],
+        $cart['amount'],
+        $purchase_price) === false){
+          set_error($oder_id.'のデータ取得に失敗しました。');
+        }
   }
+  delete_user_carts($db, $carts[0]['user_id']);
+  $db->commit();
+
+  if(has_error() === true){
+    return false;
+  }
+  return true;
 }
 
 function delete_user_carts($db, $user_id){
