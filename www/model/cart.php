@@ -138,11 +138,12 @@ function purchase_carts($db, $carts){
   if(validate_cart_purchase($carts) === false){
     return false;
   }
-  $dbh->beginTransaction();
+  $db->beginTransaction();
   if(insert_history($db,$carts[0]['user_id'], sum_carts($carts)) === false) {
     set_error('購入履歴の作成に失敗しました。');
+    return false;
   }
-  $oder_id = $dbh->lastInsertId();
+  $oder_id = $db->lastInsertId();
 
   foreach($carts as $cart){
     if(update_item_stock(
@@ -153,12 +154,12 @@ function purchase_carts($db, $carts){
       set_error($cart['name'] . 'の購入に失敗しました。');
     }
     if(insert_details(
+        $db,
         $oder_id,
         $cart['item_id'],
         $cart['amount'],
         $cart['price']) === false){
-          set_error($cart['name'],.'の購入明細の作成に失敗しました。');
-          return false;
+          set_error($cart['name'].'の購入明細の作成に失敗しました。');
     }
   }
   delete_user_carts($db, $carts[0]['user_id']);
