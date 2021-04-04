@@ -84,16 +84,17 @@ function sum_purchase($carts,$purchase_price){
   return $quantity;
 }
 
-function insert_history($db,$user_id){
+function insert_history($db,$user_id,$quantity){
     $sql = "
       INSERT INTO
         purchase_history(
           user_id,
           order_datetime,
+          quantity
         )
       VALUES(?,now(),?)
     ";
-    return execute_query($db,$sql,[$user_id]);
+    return execute_query($db,$sql,[$user_id,$quantity]);
 }
 function insert_details($db,$order_id,$item_id,$amount,$purchase_price){
   $sql = "
@@ -138,7 +139,9 @@ function purchase_carts($db, $carts){
     return false;
   }
   $dbh->beginTransaction();
-  insert_history($db,$carts[0]['user_id']);
+  if(insert_history($db,$carts[0]['user_id'], sum_carts($carts)) === false) {
+    set_error('購入履歴の作成に失敗しました。');
+  }
   $oder_id = $dbh->lastInsertId();
 
   foreach($carts as $cart){
@@ -153,17 +156,20 @@ function purchase_carts($db, $carts){
         $oder_id,
         $cart['item_id'],
         $cart['amount'],
-        $purchase_price) === false){
-          set_error($oder_id.'のデータ取得に失敗しました。');
-        }
+        $cart['price']) === false){
+          set_error($cart['name'],.'の購入明細の作成に失敗しました。');
+          return false;
+    }
   }
   delete_user_carts($db, $carts[0]['user_id']);
-  $db->commit();
 
   if(has_error() === true){
+    $db -> rollback();
     return false;
+  }else {
+    $db -> commit();
+    return true;
   }
-  return true;
 }
 
 function delete_user_carts($db, $user_id){
