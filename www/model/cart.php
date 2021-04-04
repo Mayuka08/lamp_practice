@@ -75,6 +75,40 @@ function insert_cart($db, $user_id, $item_id, $amount = 1){
 
   return execute_query($db, $sql,[$item_id,$user_id,$amount]);
 }
+// $quantity　コントローラーで呼び出す
+function sum_purchase($carts,$purchase_price){
+  $quantity = 0;
+  foreach($carts as $cart){
+    $quantity += $purchase_price * $cart['amount'];
+  }
+  return $quantity;
+}
+
+function insert_history($db,$user_id,$quantity){
+    $sql = "
+      INSERT INTO
+        purchase_history(
+          user_id,
+          order_datetime,
+          quantity
+        )
+      VALUES(?,now(),?)
+    ";
+    return execute_query($db,$sql,[$user_id,$quantity]);
+}
+function insert_details($db,$order_id,$item_id,$amount,$purchase_price){
+  $sql = "
+    INSERT INTO
+      purchase_details(
+        order_id,
+        item_id,
+        amount,
+        purchase_price
+      )
+    VALUES(?,?,?,?)
+  ";
+  return execute_query($db,$sql,[$order_id,$item_id,$amount,$purchase_price]);
+}
 
 function update_cart_amount($db, $cart_id, $amount){
   $sql = "
@@ -97,14 +131,20 @@ function delete_cart($db, $cart_id){
       cart_id = ?
     LIMIT 1
   ";
-
   return execute_query($db, $sql,[$cart_id]);
 }
-
+//購入後カートの中身削除、在庫変動、履歴＆明細にデータいれる
 function purchase_carts($db, $carts){
   if(validate_cart_purchase($carts) === false){
     return false;
   }
+  $db->beginTransaction();
+  if(insert_history($db,$carts[0]['user_id'], sum_carts($carts)) === false) {
+    set_error('購入履歴の作成に失敗しました。');
+    return false;
+  }
+  $oder_id = $db->lastInsertId();
+
   foreach($carts as $cart){
     if(update_item_stock(
         $db, 
@@ -113,9 +153,24 @@ function purchase_carts($db, $carts){
       ) === false){
       set_error($cart['name'] . 'の購入に失敗しました。');
     }
+    if(insert_details(
+        $db,
+        $oder_id,
+        $cart['item_id'],
+        $cart['amount'],
+        $cart['price']) === false){
+          set_error($cart['name'].'の購入明細の作成に失敗しました。');
+    }
   }
-  
   delete_user_carts($db, $carts[0]['user_id']);
+
+  if(has_error() === true){
+    $db -> rollback();
+    return false;
+  }else {
+    $db -> commit();
+    return true;
+  }
 }
 
 function delete_user_carts($db, $user_id){
