@@ -75,7 +75,6 @@ function insert_cart($db, $user_id, $item_id, $amount = 1){
 
   return execute_query($db, $sql,[$item_id,$user_id,$amount]);
 }
-// $quantity　コントローラーで呼び出す
 function sum_purchase($carts,$purchase_price){
   $quantity = 0;
   foreach($carts as $cart){
@@ -110,6 +109,49 @@ function insert_details($db,$order_id,$item_id,$amount,$purchase_price){
   return execute_query($db,$sql,[$order_id,$item_id,$amount,$purchase_price]);
 }
 
+// ユーザ毎の購入履歴
+function history($db, $user_id){
+  $sql = "
+    SELECT
+      purchase_history.order_id,
+      purchase_history.order_datetime,
+      purchase_history.quantity
+    FROM
+      purchase_history
+    JOIN
+      purchase_details
+    ON
+      purchase_history.order_id = purchase_details.order_id
+    WHERE
+      user_id = ?
+    GROUP BY
+      order_id
+    ORDER BY
+      order_datetime desc
+  ";
+  return fetch_all_query($db, $sql, [$user_id]);
+}
+
+//購入詳細
+function detail($db, $order_id){
+  $sql = "
+    SELECT
+      purchase_details.purchase_price,
+      purchase_details.amount,
+      items.name
+    FROM
+      purchase_details
+    JOIN
+      items
+    ON
+      purchase_details.item_id = items.item_id
+    WHERE
+      order_id = ?
+    GROUP BY
+      purchase_details.price, purchase_details.amount, items.name
+  ";
+  return fetch_all_query($db, $sql, [$order_id]);
+}
 function update_cart_amount($db, $cart_id, $amount){
   $sql = "
     UPDATE
