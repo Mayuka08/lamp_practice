@@ -17,7 +17,7 @@ if(is_admin($user) === false){
     redirect_to(LOGIN_URL);
   }
 
-$histories = history($db, $user['user_id']);
+$histories = get_history($db, $user['user_id']);
 $order_id = get_post('order_id');
 $token =get_csrf_token();
 

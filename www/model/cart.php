@@ -110,7 +110,7 @@ function insert_details($db,$order_id,$item_id,$amount,$purchase_price){
 }
 
 // ユーザ毎の購入履歴
-function history($db, $user_id){
+function get_history($db, $user_id){
   $sql = "
     SELECT
       purchase_history.order_id,
@@ -118,14 +118,8 @@ function history($db, $user_id){
       purchase_history.quantity
     FROM
       purchase_history
-    JOIN
-      purchase_details
-    ON
-      purchase_history.order_id = purchase_details.order_id
     WHERE
       user_id = ?
-    GROUP BY
-      order_id
     ORDER BY
       order_datetime desc
   ";
@@ -133,7 +127,7 @@ function history($db, $user_id){
 }
 
 //購入詳細
-function detail($db, $order_id){
+function get_detail($db, $order_id){
   $sql = "
     SELECT
       purchase_details.purchase_price,

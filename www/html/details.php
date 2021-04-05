@@ -13,11 +13,11 @@ if(is_logined() === false){
 
 $db = get_db_connect();
 $user = get_login_user($db);
-$histories = history($db, $user['user_id']);
+$histories = get_history($db, $user['user_id']);
 $order_id = get_post('order_id');
 $token =get_csrf_token();
 
-$details = detail($db, $user['user_id']);
+$details = get_detail($db, $user['user_id']);
 
 $quantity = sum_purchase($carts,$purchase_price);
 
