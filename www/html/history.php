@@ -14,9 +14,9 @@ $db = get_db_connect();
 $user = get_login_user($db);
 
 if(is_admin($user) === false){
-    $histories = ;     // このコントーラは管理者、一般ユーザに関わらず見れるようにする必要があるので、一般ユーザをリダイレクトしてはダメです。
+    $histories = get_history($db, $user['user_id']);     // このコントーラは管理者、一般ユーザに関わらず見れるようにする必要があるので、一般ユーザをリダイレクトしてはダメです。
   }else {
-    $histories = get_history($db, $user['user_id']);
+    $histories = get_admin_history($db);   //管理者による全データ閲覧
   }
   
 $token =get_csrf_token();

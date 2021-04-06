@@ -75,10 +75,10 @@ function insert_cart($db, $user_id, $item_id, $amount = 1){
 
   return execute_query($db, $sql,[$item_id,$user_id,$amount]);
 }
-function sum_purchase($carts,$purchase_price){
+function sum_purchase($histories){
   $quantity = 0;
-  foreach($carts as $cart){
-    $quantity += $purchase_price * $cart['amount'];
+  foreach($histories as $history){
+    $quantity += $history['purchase_price'] * $history['amount'];
   }
   return $quantity;
 }
@@ -124,6 +124,20 @@ function get_history($db, $user_id){
       order_datetime desc
   ";
   return fetch_all_query($db, $sql, [$user_id]);
+}
+//管理者ユーザが全履歴閲覧可能
+function get_admin_history($db){
+  $sql = "
+    SELECT
+      purchase_history.order_id,
+      purchase_history.order_datetime,
+      purchase_history.quantity
+    FROM
+      purchase_history
+    ORDER BY
+      order_datetime desc
+  ";
+  return fetch_all_query($db, $sql);
 }
 
 //購入詳細

@@ -12,7 +12,6 @@
 
     <?php include VIEW_PATH . 'templates/messages.php'; ?>
 
-    <?php if(count($histories) > 0){ ?>
       <table class="table table-bordered">
         <thead class="thead-light">
         <tr>
@@ -22,7 +21,7 @@
         </tr>
         </thead>
         <tbody>
-          <?php foreach($histories as $history){ ?>
+        <?php foreach($histories as $history){ ?>
           <tr>
             <td><?php print($history['order_id']);?></td>
             <td><?php print($history['order_datetime']); ?></td>
@@ -32,12 +31,10 @@
               <input type="submit" value="購入明細表示">
               <input type="hidden" name="order_id" value="<?php print($history['order_id']); ?>">
             </form>
-          </td>
-        </tr>
-      <?php } ?>
+            </td>
+          </tr>
       </tbody>
     </table>
-
     <!-- 購入明細 -->
     <table>
       <thead>
@@ -59,5 +56,6 @@
       <?php } ?>
       </tbody>
     </table>
-  </body>
+  </div>
+</body>
 </html>

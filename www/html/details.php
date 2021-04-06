@@ -19,6 +19,6 @@ $token =get_csrf_token();
 
 $details = get_detail($db, $user['user_id']);
 
-$quantity = sum_purchase($carts,$purchase_price);
+$quantity = sum_purchase($histories);
 
 include_once VIEW_PATH . 'details_view.php';
