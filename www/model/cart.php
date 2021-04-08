@@ -125,6 +125,22 @@ function get_history($db, $user_id){
   ";
   return fetch_all_query($db, $sql, [$user_id]);
 }
+//購入明細で紐づいた購入履歴
+function get_details_history($db, $order_id){
+  $sql = "
+    SELECT
+      purchase_history.user_id,
+      purchase_history.order_datetime,
+      purchase_history.quantity
+    FROM
+      purchase_history
+    WHERE
+      order_id = ?
+    ORDER BY
+      order_datetime desc
+  ";
+  return fetch_all_query($db, $sql, [$order_id]);
+}
 //管理者ユーザが全履歴閲覧可能
 function get_admin_history($db){
   $sql = "
@@ -138,6 +154,22 @@ function get_admin_history($db){
       order_datetime desc
   ";
   return fetch_all_query($db, $sql);
+}
+//購入明細管理者用明細
+function get_admin_details_history($db,$order_id){
+  $sql = "
+    SELECT
+      purchase_history.user_id,
+      purchase_history.order_datetime,
+      purchase_history.quantity
+    FROM
+      purchase_history
+    WHERE
+      order_id = ?
+    ORDER BY
+      order_datetime desc
+  ";
+  return fetch_all_query($db, $sql,[$order_id]);
 }
 
 //購入詳細
@@ -159,6 +191,26 @@ function get_detail($db, $order_id){
       purchase_details.price, purchase_details.amount, items.name
   ";
   return fetch_all_query($db, $sql, [$order_id]);
+}
+//購入詳細の内容閲覧
+function get_details_detail($db, $user_id){
+  $sql = "
+    SELECT
+      purchase_details.purchase_price,
+      purchase_details.amount,
+      items.name
+    FROM
+      purchase_details
+    JOIN
+      items
+    ON
+      purchase_details.item_id = items.item_id
+    WHERE
+      user_id = ?
+    GROUP BY
+      purchase_details.price, purchase_details.amount, items.name
+  ";
+  return fetch_all_query($db, $sql, [$user_id]);
 }
 function update_cart_amount($db, $cart_id, $amount){
   $sql = "
