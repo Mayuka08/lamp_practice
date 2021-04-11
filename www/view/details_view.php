@@ -43,9 +43,9 @@
       <?php foreach($details as $detail){ ?>
         <tr>
           <td><?php print(h($detail['name'])); ?></td>
-          <td><?php print(h($detail['price'])); ?></td>
-          <td><?php print(h($detail['amount'])); ?></td>
           <td><?php print(h($detail['purchase_price'])); ?></td>
+          <td><?php print(h($detail['amount'])); ?></td>
+          <td><?php print(h($detail['purchase_price']) * h($detail['amount'])); ?></td>
         </tr>
       <?php } ?>
       </tbody>

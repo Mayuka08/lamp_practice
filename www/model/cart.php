@@ -83,14 +83,6 @@ function sum_purchase($histories){
   return $quantity;
 }
 
-function sum_subtotal($details){
-  $purchase_price = 0;
-  foreach($details as $detail){
-    $purchase_price += $detail['price'] * $detail['amount'];
-  }
-  return $purchase_price;
-}
-
 function insert_history($db,$user_id,$quantity){
     $sql = "
       INSERT INTO
@@ -197,11 +189,10 @@ function get_detail($db, $order_id){
   return fetch_all_query($db, $sql, [$order_id]);
 }
 //購入詳細の内容閲覧
-function get_details_detail($db, $user_id){
+function get_details_detail($db, $user_id,$order_id){
   $sql = "
     SELECT
       items.name,
-      items.price,
       purchase_details.purchase_price,
       purchase_details.amount
     FROM
@@ -216,8 +207,10 @@ function get_details_detail($db, $user_id){
       purchase_details.order_id = purchase_history.order_id
     WHERE
       purchase_history.user_id = ?
+    AND
+      purchase_history.order_id = ?
     ";
-  return fetch_all_query($db, $sql, [$user_id]);
+  return fetch_all_query($db, $sql, [$order_id,$user_id]);
 }
 function update_cart_amount($db, $cart_id, $amount){
   $sql = "
