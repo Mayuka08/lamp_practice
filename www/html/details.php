@@ -16,10 +16,10 @@ $user = get_login_user($db);
 $order_id = get_post('order_id');
 $token =get_csrf_token();
 
-// 購入履歴画面と同様に、管理者と一般ユーザとでデータの取得方法が異なってくると思います。
+// 購入履歴画面と同様に、管理者と一般ユーザとでデータの取得方法が異なってくる
  if (is_admin($user) === false) {
-   $histories = get_details_history($db, $order_id,$user['user_id']); //order_idを条件に追加した関数
-   $details = get_details_detail($db,$order_id, $user['user_id']); //内容に、user_idを条件に追加した関数
+   $histories = get_details_history($db, $order_id,$user['user_id']);
+   $details = get_details_detail($db,$order_id, $user['user_id']);
  }else {
    $histories = get_admin_details_history($db,$order_id);//内容に、order_idを条件に追加した関数
    $details = get_detail($db, $order_id);

@@ -189,7 +189,7 @@ function get_detail($db, $order_id){
   return fetch_all_query($db, $sql, [$order_id]);
 }
 //購入詳細の内容閲覧
-function get_details_detail($db, $user_id,$order_id){
+function get_details_detail($db,$order_id,$user_id){
   $sql = "
     SELECT
       items.name,
@@ -210,7 +210,7 @@ function get_details_detail($db, $user_id,$order_id){
     AND
       purchase_history.order_id = ?
     ";
-  return fetch_all_query($db, $sql, [$order_id,$user_id]);
+  return fetch_all_query($db, $sql,[$user_id,$order_id]);
 }
 function update_cart_amount($db, $cart_id, $amount){
   $sql = "
