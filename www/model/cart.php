@@ -75,11 +75,10 @@ function insert_cart($db, $user_id, $item_id, $amount = 1){
 
   return execute_query($db, $sql,[$item_id,$user_id,$amount]);
 }
-// $quantity　コントローラーで呼び出す
-function sum_purchase($carts,$purchase_price){
+function sum_purchase($histories){
   $quantity = 0;
-  foreach($carts as $cart){
-    $quantity += $purchase_price * $cart['amount'];
+  foreach($histories as $history){
+    $quantity += $history['purchase_price'] * $history['amount'];
   }
   return $quantity;
 }
@@ -110,6 +109,109 @@ function insert_details($db,$order_id,$item_id,$amount,$purchase_price){
   return execute_query($db,$sql,[$order_id,$item_id,$amount,$purchase_price]);
 }
 
+// ユーザ毎の購入履歴
+function get_history($db, $user_id){
+  $sql = "
+    SELECT
+      purchase_history.order_id,
+      purchase_history.order_datetime,
+      purchase_history.quantity
+    FROM
+      purchase_history
+    WHERE
+      user_id = ?
+    ORDER BY
+      order_datetime desc
+  ";
+  return fetch_all_query($db, $sql, [$user_id]);
+}
+//購入明細で紐づいた購入履歴
+function get_details_history($db, $order_id,$user_id){
+  $sql = "
+    SELECT
+      purchase_history.order_id,
+      purchase_history.order_datetime,
+      purchase_history.quantity
+    FROM
+      purchase_history
+    WHERE
+      order_id = ?
+    AND
+      user_id = ?
+  ";
+  return fetch_all_query($db, $sql, [$order_id,$user_id]);
+}
+//管理者ユーザが全履歴閲覧可能
+function get_admin_history($db){
+  $sql = "
+    SELECT
+      purchase_history.order_id,
+      purchase_history.order_datetime,
+      purchase_history.quantity
+    FROM
+      purchase_history
+    ORDER BY
+      order_datetime desc
+  ";
+  return fetch_all_query($db, $sql);
+}
+//購入明細管理者用明細
+function get_admin_details_history($db,$order_id){
+  $sql = "
+    SELECT
+      purchase_history.order_id,
+      purchase_history.order_datetime,
+      purchase_history.quantity
+    FROM
+      purchase_history
+    WHERE
+      order_id = ?
+  ";
+  return fetch_all_query($db, $sql,[$order_id]);
+}
+
+//購入詳細
+function get_detail($db, $order_id){
+  $sql = "
+    SELECT
+      purchase_details.purchase_price,
+      purchase_details.amount,
+      items.name
+    FROM
+      purchase_details
+    JOIN
+      items
+    ON
+      purchase_details.item_id = items.item_id
+    WHERE
+      order_id = ?
+  ";
+  return fetch_all_query($db, $sql, [$order_id]);
+}
+//購入詳細の内容閲覧
+function get_details_detail($db,$order_id,$user_id){
+  $sql = "
+    SELECT
+      items.name,
+      purchase_details.purchase_price,
+      purchase_details.amount
+    FROM
+      purchase_details
+    JOIN
+      items
+    ON
+      purchase_details.item_id = items.item_id
+    INNER JOIN
+      purchase_history
+    ON
+      purchase_details.order_id = purchase_history.order_id
+    WHERE
+      purchase_history.user_id = ?
+    AND
+      purchase_history.order_id = ?
+    ";
+  return fetch_all_query($db, $sql,[$user_id,$order_id]);
+}
 function update_cart_amount($db, $cart_id, $amount){
   $sql = "
     UPDATE
