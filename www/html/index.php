@@ -16,4 +16,6 @@ $user = get_login_user($db);
 $items = get_open_items($db);
 $token =get_csrf_token();
 
+get_sort_order($db,$is_open = false,$sort);
+
 include_once VIEW_PATH . 'index_view.php';
