@@ -13,7 +13,7 @@
   <div class="container">
     <h1>商品一覧</h1>
     <?php include VIEW_PATH . 'templates/messages.php'; ?>
-      <form action="./index.php" method="POST">
+      <form action="./index.php" method="get">
         <select name="sort">
             <option value="new" <?php if ($sort === 'new') print 'selected'; ?>>新着順</option>
             <option value="cost_up" <?php if ($sort === 'cost_up') print 'selected'; ?>>価格の安い順</option>
