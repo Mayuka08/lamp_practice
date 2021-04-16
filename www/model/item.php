@@ -22,7 +22,7 @@ function get_item($db, $item_id){
   return fetch_query($db, $sql,[$item_id]);
 }
 
-function get_items($sort,$db, $is_open = false){
+function get_items($db, $sort=null, $is_open = false){
   $sql = '
     SELECT
       item_id, 
@@ -46,7 +46,7 @@ function get_items($sort,$db, $is_open = false){
     } else if ($sort === 'cost_down') {
       $sql .= ' ORDER BY price DESC';
     }
-  return fetch_all_query($db, $sort, $sql);
+  return fetch_all_query($db, $sql);
 }
 
 function get_all_items($db){
