@@ -15,9 +15,9 @@ $user = get_login_user($db);
 $token =get_csrf_token();
 
 $sort = strtolower(get_get('sort'));
-$items = get_open_items($db, $sort);
-if(empty($sort) !== true) {
-  $items;
+if(empty($sort)) {
+  $sort = 'new';
 }
+$items = get_open_items($db, $sort);
 
 include_once VIEW_PATH . 'index_view.php';

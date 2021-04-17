@@ -19,5 +19,5 @@ if(is_admin($user) === false){
 }
 $token =get_csrf_token();
 
-$items = get_all_items($sort,$db);
+$items = get_all_items($db);
 include_once VIEW_PATH . '/admin_view.php';
