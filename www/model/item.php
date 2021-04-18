@@ -53,8 +53,8 @@ function get_all_items($db){
   return get_items($db);
 }
 
-function get_open_items($sort,$db){
-  return get_items($sort,$db, true);
+function get_open_items($db,$sort){
+  return get_items($db,$sort, true);
 }
 
 function regist_item($db, $name, $price, $stock, $status, $image){
