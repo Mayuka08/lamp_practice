@@ -49,6 +49,16 @@
       <?php } ?>
       </div>
     </div>
+    <h1>人気ランキング</h1>
+    <div class="card-header">
+    <?php foreach($rows as $row){ ?>
+    <tr>
+       <td>
+        <?php print(h($row['name'])); ?>
+        </td>
+        <td><img class="card-img" src="<?php print(IMAGE_PATH . h($row['image'])); ?>"></td>
+    </tr>
+    <?php } ?>
   </div>
   
 </body>
