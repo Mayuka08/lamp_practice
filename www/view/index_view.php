@@ -51,6 +51,11 @@
     </div>
     <h1>人気ランキング</h1>
     <div class="card-header">
+    <tr>
+      <th>１位</th>
+      <th>２位</th>
+      <th>３位<th>
+    </tr>
     <?php foreach($rows as $row){ ?>
     <tr>
        <td>

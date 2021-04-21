@@ -20,4 +20,5 @@ if(empty($sort)) {
 }
 $items = get_open_items($db, $sort);
 $rows = get_ranking($db);
+
 include_once VIEW_PATH . 'index_view.php';

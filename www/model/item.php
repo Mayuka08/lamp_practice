@@ -212,3 +212,25 @@ function is_valid_item_status($status){
   }
   return $is_valid;
 }
+//ランキング
+function get_ranking($db){
+  $sql = "
+    SELECT
+      items.name,
+      items.image,
+      SUM(amount)
+    FROM
+      purchase_details
+    JOIN
+      items
+    ON 
+    items.items_id = purchase_details.item_id
+    GROUP BY 
+      purchase_details.item_id
+    ORDER BY
+     SUM(amount) DESC
+
+    LIMIT 3
+    ";
+  return fetch_all_query($db, $sql);
+}

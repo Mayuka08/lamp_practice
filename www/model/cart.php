@@ -314,22 +314,3 @@ function validate_cart_purchase($carts){
   return true;
 }
 
-function get_ranking($db){
-  $sql = "
-    SELECT
-      items.name,
-      items.image,
-      SUM(purchase_detais.order_id)
-    FROM
-      purchase_details
-    JOIN
-      items
-    ON
-      purchase_details.item_id = items.item_id
-    ORDER BY
-     SUM(purchase_details.order_id)
-    LIMIT 3
-    ";
-  return fetch_all_query($db, $sql);
-}
-
