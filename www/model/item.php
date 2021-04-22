@@ -224,7 +224,7 @@ function get_ranking($db){
     JOIN
       items
     ON 
-    items.items_id = purchase_details.item_id
+    items.item_id = purchase_details.item_id
     GROUP BY 
       purchase_details.item_id
     ORDER BY
